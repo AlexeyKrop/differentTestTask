@@ -1,6 +1,8 @@
 import React from 'react';
 import {SubmitHandler, useForm} from "react-hook-form";
-import {authAPI} from "./dal/api";
+import {authAPI, profileAPI} from "./dal/api";
+import {useDispatch} from "react-redux";
+import {setProfileAC, setProfileStatusAC} from "./bll/profileReducer";
 
 type Inputs = {
   email: string,
@@ -8,14 +10,17 @@ type Inputs = {
   rememberMe?: boolean
 };
 export const Login = () => {
+  const dispatch = useDispatch()
   const {register, handleSubmit, watch, formState: {errors}} = useForm<Inputs>();
   const onSubmit: SubmitHandler<Inputs> = data => {
     let {email, password, rememberMe} = data
     authAPI.login(email, password, rememberMe)
       .then(res =>
         authAPI.me()
-          .then(res => console.log(res.data.data.id))
-
+          .then(res => profileAPI.getProfile(res.data.data.id))
+          .then(res => dispatch(setProfileAC(res.data)))
+          .then(res => profileAPI.getProfileStatus(res.profile.userId))
+          .then(res => dispatch(setProfileStatusAC(res.data)))
       )
   }
 

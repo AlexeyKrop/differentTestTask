@@ -1,25 +1,29 @@
 import axios from "axios";
 
+const instance = axios.create({
+  baseURL: 'https://social-network.samuraijs.com/api/1.0',
+  withCredentials: true
+});
 
-export const postApi = {
-  getPosts(){
-    return axios.get<Array<PostType>>('https://jsonplaceholder.typicode.com/posts/')
+export const profileAPI = {
+  getProfile(id: number){
+    return instance.get(`profile/${id}`)
   },
-  createPost(title: string, body: string, userId: number){
-    return axios.post<PostType>('https://jsonplaceholder.typicode.com/posts', { title, body, userId})
+  getProfileStatus(id: number){
+    return instance.get(`profile/status/${id}`)
   },
-  updatePost(id: number, title: string, body: string, userId: number){
-    return axios.put<PostType>(`https://jsonplaceholder.typicode.com/posts/${id}`, {title, body, userId})
+  updateProfileStatus(){
+    return instance.put(`profile/status`)
   },
-  deletePost(id: number){
-    return axios.delete<PostType>(`https://jsonplaceholder.typicode.com/posts/${id}`)
+  updateProfile(){
+    return instance.put(`profile`)
   }
 }
-
-//Type
-export type PostType = {
-  id: number
-  title: string
-  body: string
-  userId: number
+export const authAPI = {
+  me(){
+    return instance.get(`auth/me`)
+  },
+  login(email: string, password: string, rememberMe : boolean = false){
+    return instance.post(`auth/login`, {email, password, rememberMe})
+  }
 }
